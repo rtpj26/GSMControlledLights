@@ -1,9 +1,10 @@
-#line 1 "C:/Users/Ronilo/Downloads/Desktop/ECE Thesis/GSM Controller Lights/DazoGSM/DazoGSM.c"
+#line 1 "D:/ECE Thesis/GSM Controller Lights/GSMControlledLights/DazoGSM.c"
 void initPorts();
 void sendSMS(char*);
 void sendATCommand(char*);
 void detectBO();
 void readSMS();
+void deleteMsgs();
 
 const unsigned char *recepientNumber = "09258741785";
 
@@ -30,17 +31,17 @@ void readSMS(){
  char *outdoorError = "There might be a problem with your OUTDOOR Lights. please check";
  char *outdoorOn = "OUTDOOR Lights On";
  char *outdoorOff = "OUTDOOR Lights Off";
- char inStr[25];
+ char inStr[100];
  unsigned int i=0;
 
  if(UART1_Data_Ready()){
- while(UART1_Data_Ready()){
- inStr[i] = UART1_Read();
- i++;
- Delay_ms(1);
- }
+#line 41 "D:/ECE Thesis/GSM Controller Lights/GSMControlledLights/DazoGSM.c"
+ UART_Read_Text(inStr, "\n", 255);
+
  Delay_ms(200);
- if(strstr(inStr, "IN")){
+ UART1_Write_Text(inStr);
+
+ if(strstr(inStr, "INDOOR")){
  PORTB.F0 = ~PORTB.F0;
  if(PORTB.RB5 == 0 && PORTB.RB0 == 1){
  sendSMS(indoorError);
@@ -53,7 +54,7 @@ void readSMS(){
  }
  }
 
- if(strstr(inStr, "OU")){
+ if(strstr(inStr, "OUTDOOR")){
  PORTB.F1 = ~PORTB.F1;
  if(PORTB.RB6 == 0 && PORTB.RB1 == 1){
  sendSMS(outdoorError);
@@ -71,7 +72,7 @@ void readSMS(){
 }
 
 void initPorts(){
- ADCON1 = 0x08;
+ ADCON1 = 0x07;
  TRISB = 0xF0;
  PORTB = 0x00;
  UART1_Init(9600);
@@ -115,4 +116,8 @@ void detectBO(){
  if(PORTB.F4 == 1)sendSMS("The power is back");
  }
  if(PORTB.F4 == 1) BOSMSSent = 0;
+}
+
+void deleteMsgs(){
+ sendATCommand("AT+CMGD=1,4\r\n");
 }

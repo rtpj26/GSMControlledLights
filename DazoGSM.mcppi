@@ -1,5 +1,5 @@
 [DEVICE]
-Name=P16F877A
+Name=P18F4550
 Clock=4000000
 [MEMORY_MODEL]
 Value=-1
@@ -33,11 +33,12 @@ Count=0
 [OTHER_FILES]
 Count=0
 [SEARCH_PATH]
-Count=4
+Count=5
 Path0=C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for PIC\defs\
-Path1=C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for PIC\Uses\P16\
-Path2=C:\Users\Ronilo\Downloads\Desktop\ECE Thesis\GSM Controller Lights\DazoGSM\
-Path3=C:\Users\Ronilo\Downloads\Desktop\DazoGSM\
+Path1=C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for PIC\uses\P18\
+Path2=D:\ECE Thesis\GSM Controller Lights\GSMControlledLights\
+Path3=C:\Users\Ronilo\Downloads\Desktop\ECE Thesis\GSM Controller Lights\DazoGSM\
+Path4=C:\Users\Ronilo\Downloads\Desktop\DazoGSM\
 [HEADER_PATH]
 Count=0
 [HEADERS]
