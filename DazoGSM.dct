@@ -565,7 +565,6 @@ delay_5ms
 delay_80us
 delay_8ms
 delay_cyc
-deletemsgs
 detectbo
 dfn8ee
 dfn8ee_bit
@@ -845,7 +844,6 @@ glcd_write_data
 glcd_write_text
 glcd_write_text_adv
 glcd_write_text_return_pos
-globe
 go
 go_bit
 go_done
@@ -1611,7 +1609,6 @@ sin
 sine3
 sinh
 size
-smart
 smp
 smp_bit
 sofie
@@ -1963,7 +1960,6 @@ strspn
 strstr
 strtok
 sub_32x32_fp
-sun
 suspnd
 suspnd_bit
 swap

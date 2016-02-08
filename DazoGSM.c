@@ -3,20 +3,15 @@ void sendSMS(char*);
 void sendATCommand(char*);
 void detectBO();
 void readSMS();
-void deleteMsgs();
 
 const unsigned char *recepientNumber = "09258741785";
 
-const unsigned char *smart = "09999521775";
-const unsigned char *sun = "09258741785";
-const unsigned char *globe = "09151618571";
-
 const unsigned int SIZE = 255;
 unsigned int BOSMSSent = 0;
-//RB4: Power Failure SMS
+
 void main() {
      initPorts();
-     Delay_ms(500);
+
      while(1){
          detectBO();
          readSMS();
@@ -30,20 +25,18 @@ void readSMS(){
       char *outdoorError = "There might be a problem with your OUTDOOR Lights. please check";
       char *outdoorOn = "OUTDOOR Lights On";
       char *outdoorOff = "OUTDOOR Lights Off";
+
+      char *smart = "+639999521775";
+      char *sun = "+639258741785";
+      char *globe = "+639151618571";
+
       char inStr[100];
       unsigned int i=0;
       
       if(UART1_Data_Ready()){
-        /*while(UART1_Data_Ready()){
-             inStr[i++] = UART1_Read();
-             //Delay_ms(1);
-        }*/
-        UART_Read_Text(inStr, "\n", 255);
-
+        UART_Read_Text(inStr, "--", 100);
         Delay_ms(200);
-        UART1_Write_Text(inStr);
-        
-        if(strstr(inStr, "INDOOR")){
+        if(strstr(inStr, "INDOOR") && ((strstr(inStr, smart) || strstr(inStr, globe) || strstr(inStr, sun)))){
              PORTB.F0 = ~PORTB.F0;
              if(PORTB.RB5 == 0 && PORTB.RB0 == 1){
                   sendSMS(indoorError);
@@ -56,7 +49,7 @@ void readSMS(){
              }
         }
         
-        if(strstr(inStr, "OUTDOOR")){
+        else if(strstr(inStr, "OUTDOOR") && ((strstr(inStr, smart) || strstr(inStr, globe) || strstr(inStr, sun)))){
               PORTB.F1 = ~PORTB.F1;
               if(PORTB.RB6 == 0 && PORTB.RB1 == 1){
                    sendSMS(outdoorError);
@@ -68,6 +61,10 @@ void readSMS(){
                    }
              }
         }
+        else{
+        }
+        EEPROM_Write(0x38, PORTB); //Kwa on ang previous status sng PIC
+        sendATCommand("AT+CMGD=1,4\r\n");
       }
       Delay_ms(100);
 
@@ -76,6 +73,7 @@ void readSMS(){
 void initPorts(){
      ADCON1 = 0x07;
      TRISB = 0xF0;
+     TRISA= 0xFF;
      PORTB = 0x00;
      UART1_Init(9600);
      sendATCommand("AT+CNMI=1,0,2,0,1\r\n");
@@ -94,6 +92,7 @@ void sendATCommand(char *cmd){
 void sendSMS(char *msg){
       char in;
      int i;
+     Delay_ms(2000);
      UART1_Write_Text("AT+CMGS=\"");
      for(i=0; i < 11; i++)
               UART1_Write(*(recepientNumber+i));
@@ -114,12 +113,11 @@ void detectBO(){
       if(PORTB.F4 == 0 && BOSMSSent == 0){
               sendSMS("The power is off");
               BOSMSSent = 1;
-              while(PORTB.F4 == 0);
-              if(PORTB.F4 == 1)sendSMS("The power is back");
+              while(BOSMSSent == 1){
+                  if(PORTB.F4 == 1) BOSMSSent = 0;
+              }
+              sendSMS("The power is back");
+              PORTB = EEPROM_Read(0x38); //if magbalik ang suga, kwaun ang status kag ebalik sa portB
       }
-      if(PORTB.F4 == 1) BOSMSSent = 0;
-}
-
-void deleteMsgs(){
-     sendATCommand("AT+CMGD=1,4\r\n");
+      BOSMSSent = 0;
 }
